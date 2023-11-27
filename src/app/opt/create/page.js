@@ -170,7 +170,7 @@ const Create = () => {
               Buat Akun
             </button>
           </div>
-          {isSubmitted ? <p>Akun berhasil dibuat</p> : null}
+          {isSubmitted ? <p className="text-blue-700 mt-3">Akun berhasil dibuat</p> : null}
         </form>
       </div>
     </BaseLayout_opt>
