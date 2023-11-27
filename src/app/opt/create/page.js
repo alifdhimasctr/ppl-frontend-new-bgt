@@ -8,9 +8,8 @@ import { useRouter } from "next/navigation";
 const Create = () => {
   const router = useRouter();
 
-  const generateRandomEmail = () => {
-    const randomString = Math.random().toString(36).substring(2, 8);
-    return `mahasiswa_${randomString}@example.com`;
+  const convertToLowerCaseWithoutSpace = (input) => {
+    return input.replace(/\s/g, '').toLowerCase();
   };
 
   const [cookies, setCookie] = useCookies(["token"]);
@@ -20,9 +19,9 @@ const Create = () => {
     nama: "",
     angkatan: "",
     iddosen: "",
-    email: generateRandomEmail(),
-  });
 
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
 
   const [dosenwaliList, setDosenwaliList] = useState([]);
@@ -45,17 +44,16 @@ const Create = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log("Submitting form...");
-      console.log("Random Email:", formData.email);
+
 
       const res = await axios.post(
         "http://localhost:4000/usersmhs",
         {
-          NIM: pformData.NIM,
+          NIM: formData.NIM,
           nama: formData.nama,
-          angkatan: parseInt(formData.angkatan),
-          email: formData.email,
-          iddosen: parseInt(formData.iddosen),
+          email: convertToLowerCaseWithoutSpace(formData.nama) + "@student.com",
+          angkatan: formData.angkatan,
+          iddosen: formData.iddosen,
         },
         {
           headers: {
@@ -68,7 +66,10 @@ const Create = () => {
 
       if (res) {
         router.push("/opt/create");
+        setIsSubmitted(true);
       }
+
+      
     } catch (error) {
       console.error("Error:", error);
     }
@@ -129,7 +130,7 @@ const Create = () => {
                 onChange={(event) => handleChange(event, "angkatan")}
               >
                 <option value="">Pilih Tahun Angkatan</option>
-                {Array.from({ length: 5 }, (_, index) => 2021 + index).map(
+                {Array.from({ length: 7 }, (_, index) => 2023 - index).map(
                   (year) => (
                     <option key={year} value={year}>
                       {year}
@@ -147,16 +148,16 @@ const Create = () => {
                 id="iddosen"
                 value={formData.iddosen}
                 onChange={(event) => {
-                  formData.iddosen = event.target.value;
+                  handleChange(event, "iddosen");
                   console.log(formData.iddosen);
                 }}
               >
                 <option value="" disabled>
                   Pilih Dosen Wali
                 </option>
-                <option value="1">Dosen Wali 1</option>
+
                 {dosenwaliList.map((dosenwali) => (
-                  <option key={dosenwali.id} value={dosenwali.id}>
+                  <option key={dosenwali.iddosen} value={dosenwali.iddosen}>
                     {dosenwali.nama}
                   </option>
                 ))}
@@ -169,6 +170,7 @@ const Create = () => {
               Buat Akun
             </button>
           </div>
+          {isSubmitted ? <p>Akun berhasil dibuat</p> : null}
         </form>
       </div>
     </BaseLayout_opt>
