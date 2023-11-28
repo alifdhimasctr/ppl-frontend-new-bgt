@@ -16,7 +16,7 @@ export default function DashboardOperator() {
   const [cookies, setCookie] = useCookies(["token"]);
   const [role, setRole] = useCookies(["role"]);
   if(role['role'] != 'operator'){
-      router.push("/mhs");
+      router.push("/login");
   }
 
   useEffect(() => {
@@ -54,9 +54,7 @@ export default function DashboardOperator() {
           alt="profil"
         />
         {operatorData && (
-            <>
               <h1 className=" uppercase text-2xl font-semibold text-white">{operatorData.operator.nama}</h1>
-              </>
           )}
       </div>
       <div className="profil_dashboard-container2">

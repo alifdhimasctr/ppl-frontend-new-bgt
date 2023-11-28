@@ -1,9 +1,40 @@
-import React from "react";
-import BaseLayout from "@/components/BaseLayout/BaseLayout_mhs";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 import Image from "next/image";
+import BaseLayout from "@/components/BaseLayout/BaseLayout_mhs";
+
 
 export default function DashboardMahasiswa() {
+  const router = useRouter();
+  const [mahasiswaData, setMahasiswaData] = useState(null);
+  const [cookies, setCookie] = useCookies(["token"]);
+  const [role, setRole] = useCookies(["role"]);
 
+  if(role['role'] != 'mahasiswa'){
+    router.push("/login");
+  }
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/meMahasiswa", {
+        headers: {
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        setMahasiswaData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching mahasiswa data", error);
+      });
+
+      
+  }, []);
   return (
     <BaseLayout>
       <h1 className="text-4xl font-semibold text-[#183D3D] mt-5 mb-7">
@@ -20,10 +51,14 @@ export default function DashboardMahasiswa() {
           className="dashboard_profil-img"
           alt="profil"
         />
-        <h1 className="text-2xl font-semibold text-white">REFIOLA JULIETA</h1>
+         {mahasiswaData && (
+              <h1 className=" uppercase text-2xl font-semibold text-white">{mahasiswaData.mahasiswa.nama}</h1>
+          )}
       </div>
       <div className="profil_dashboard-container2">
-        <h1 className="text-lg text-black">NIM : 19821462187921389119</h1>
+        {mahasiswaData && (
+              <h1 className="text-lg text-black">NIM : {mahasiswaData.mahasiswa.NIM}</h1> 
+          )}
       </div>
     </BaseLayout>
   );

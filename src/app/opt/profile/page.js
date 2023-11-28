@@ -1,9 +1,39 @@
-import React from "react";
-import BaseLayout_opt from "@/components/BaseLayout/BaseLayout_opt";
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 import Image from "next/image";
+import BaseLayout_opt from "@/components/BaseLayout/BaseLayout_opt";
 import Link from "next/link";
 
 export default function Profile() {
+  const router = useRouter();
+  const [operatorData, setOperatorData] = useState(null);
+  const [cookies, setCookie] = useCookies(["token"]);
+  const [role, setRole] = useCookies(["role"]);
+  if(role['role'] != 'operator'){
+      router.push("/login");
+  }
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/me", {
+        headers: {
+          Authorization: `Bearer ${cookies.token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        setOperatorData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching operator data", error);
+      });
+
+      
+  }, []);
+
   return (
     <BaseLayout_opt>
       <h1 className="text-2xl font-bold text-gray-700 mb-3">
@@ -26,47 +56,42 @@ export default function Profile() {
               alt="profil"
             />
           </div>
+          {operatorData && (  
           <table className="border-none text-black">
             <tbody>
               <tr>
                 <td className="font-semibold w-40">Nama Lengkap</td>
                 <td className="ml-6 w-3">:</td>
-                <td>Refiola Julieta</td>
+                <td>{operatorData.operator.nama}</td>
               </tr>
               <tr>
                 <td className="font-semibold w-40">NIP</td>
                 <td className="ml-6 w-3">:</td>
-                <td>24060121120037</td>
-              </tr>
-              <br />
-              <tr>
-                <td className="font-semibold w-40">Tempat Lahir</td>
-                <td className="ml-6 w-3">:</td>
-                <td>Pekalongan</td>
+                <td>{operatorData.operator.NIP}</td>
               </tr>
               <tr>
-                <td className="font-semibold w-40">Tanggal Lahir</td>
+                <td className="font-semibold w-40">Fakultas</td>
                 <td className="ml-6 w-3">:</td>
-                <td>21 Februari 2003</td>
-              </tr>
-              <br />
-              <tr>
-                <td className="font-semibold w-40">Nomor HP</td>
-                <td className="ml-6 w-3">:</td>
-                <td>081234567890</td>
+                <td>{operatorData.operator.fakultas}</td>
               </tr>
               <tr>
-                <td className="font-semibold w-40">Email</td>
+                <td className="font-semibold w-40">Departemen</td>
                 <td className="ml-6 w-3">:</td>
-                <td>example@flowbite.com</td>
+                <td>{operatorData.operator.departemen}</td>
               </tr>
               <tr>
-                <td className="font-semibold w-40">Alamat</td>
+                <td className="font-semibold w-40">email</td>
                 <td className="ml-6 w-3">:</td>
-                <td>Jalan Gondang Raya No. 342</td>
+                <td>{operatorData.operator.email}</td>
+              </tr>
+              <tr>
+                <td className="font-semibold w-40">Nomor Telepon</td>
+                <td className="ml-6 w-3">:</td>
+                <td>{operatorData.operator.notelepon}</td>
               </tr>
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </BaseLayout_opt>
